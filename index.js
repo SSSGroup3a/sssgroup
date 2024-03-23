@@ -1,9 +1,23 @@
-const axios = require('axios');
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
 
-axios.get('https://api.spotify.com/v1/search?q=leaves&type=track', {
-    headers: {
-    'Authorization': 'Bearer BQDCQIC464B2cq4LK00IaY0StxlAo8PSRTGMtvbEw31hLx9Od5AT_jjPM3kZkRgGe1F8xo5GTEiu9bYJUzfNjbuvJcvVy0951xPaqg4KPUaWEEbrOq4eYZMO8eJQWms7zV4FoE4Hi1fL2KpuEOOjh1Fxie-JieOqqwouuiLDrF5ttSuEQqZeJt7qNZ6LckT-0V4Qrhaj7ZI8hoUHI4U'
-}
-}).then((data)=>{
-    console.log(data.data.tracks.items[0].id);
-})
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+
+io.on('connection', (socket) => {
+    //Handle socket connection
+    socket.on('message', (message) => {
+        //Broadcast received message to all connected clients
+        io.emit('message', message);
+    });
+});
+
+server.listen(3000, () => {
+    console.log('Server is running on http://localhost:3000');
+});
+
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+}); 
